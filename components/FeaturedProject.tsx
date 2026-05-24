@@ -78,7 +78,7 @@ export function FeaturedProject() {
             {/* Links */}
             <div className="flex flex-wrap gap-3">
               <a
-                href="https://doi.org/10.46855/energy-proceedings-11462"
+                href="https://urn.kb.se/resolve?urn=urn%3Anbn%3Ase%3Ahig%3Adiva-49646"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-scale text-sm font-semibold text-primary border border-primary px-4 py-2 rounded-lg hover:bg-white transition-colors"
@@ -86,7 +86,7 @@ export function FeaturedProject() {
                 Peer-reviewed publication →
               </a>
               <a
-                href="https://doi.org/10.46855/energy-proceedings-11462"
+                href="https://pvt4eu.eu/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-scale text-sm font-medium text-text-secondary border border-gray-200 bg-white px-4 py-2 rounded-lg hover:border-primary hover:text-primary transition-colors"
