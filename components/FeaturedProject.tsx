@@ -91,7 +91,7 @@ export function FeaturedProject() {
                 rel="noopener noreferrer"
                 className="btn-scale text-sm font-medium text-text-secondary border border-gray-200 bg-white px-4 py-2 rounded-lg hover:border-primary hover:text-primary transition-colors"
               >
-                EU Deliverable D6.2 →
+                PVT4EU Project →
               </a>
             </div>
           </div>
