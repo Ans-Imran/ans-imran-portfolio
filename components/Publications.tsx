@@ -4,8 +4,8 @@ const PUBLICATIONS = [
     authors: "Pazminno, I.A., Mousa, B.H., Shahid, A.I., Roch, E., Gomes, J. (2025).",
     title: "Comparative Analysis of Global Warming Potential and Energy Payback Time for Innovative Photovoltaic-Thermal Technologies.",
     venue: "Energy Proceedings, Vol. 61.",
-    URN: "urn:nbn:se:hig:diva-49646",
-    URNUrl: "https://urn.kb.se/resolve?urn=urn%3Anbn%3Ase%3Ahig%3Adiva-49646",
+    doi: "urn:nbn:se:hig:diva-49646",
+    doiUrl: "https://urn.kb.se/resolve?urn=urn%3Anbn%3Ase%3Ahig%3Adiva-49646",
     type: "Journal article",
   },
   {
