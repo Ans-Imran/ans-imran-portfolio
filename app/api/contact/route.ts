@@ -40,6 +40,21 @@ export async function POST(req: NextRequest) {
     // Continue even if DB insert fails
   }
 
+  // Also insert into comments table so message appears in LCA admin comments tab
+  try {
+    const client = getServiceClient();
+    await client.from("comments").insert({
+      tool_slug: "portfolio-contact",
+      full_name: name.trim(),
+      email: email.trim(),
+      comment: message.trim(),
+      status: "pending",
+      created_at: new Date().toISOString(),
+    });
+  } catch {
+    // Continue even if DB insert fails
+  }
+
   // Send email via Resend
   const resendKey = process.env.RESEND_API_KEY;
   if (resendKey) {
