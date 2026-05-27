@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { SharedToolNav } from "@/components/SharedToolNav";
+import { AnalyticsInit } from "./AnalyticsInit";
 
 export const metadata: Metadata = {
   title: "Ans Imran Shahid — LCA Specialist & Environmental Scientist, Gothenburg",
@@ -55,6 +56,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
+        <AnalyticsInit toolSlug="portfolio" />
         <SharedToolNav currentTool="" lang="en" />
         {children}
       </body>
