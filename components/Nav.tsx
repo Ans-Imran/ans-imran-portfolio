@@ -1,19 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
-const NAV_LINKS = [
-  { href: "#home",         label: "Home" },
-  { href: "#about",        label: "About" },
-  { href: "#tools",        label: "Tools" },
-  { href: "#publications", label: "Publications" },
-  { href: "#contact",      label: "Contact" },
-];
+import { useLanguage } from "@/lib/language-context";
+import { t, tx } from "@/lib/translations";
 
 export function Nav() {
+  const { lang, setLang } = useLanguage();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
+
+  const NAV_LINKS = [
+    { href: "#home",         label: tx(t.nav.home,         lang) },
+    { href: "#about",        label: tx(t.nav.about,        lang) },
+    { href: "#tools",        label: tx(t.nav.tools,        lang) },
+    { href: "#publications", label: tx(t.nav.publications, lang) },
+    { href: "#contact",      label: tx(t.nav.contact,      lang) },
+  ];
 
   useEffect(() => {
     const onScroll = () => {
@@ -24,7 +27,7 @@ export function Nav() {
   }, []);
 
   useEffect(() => {
-    const sections = NAV_LINKS.map((l) => l.href.slice(1));
+    const sections = ["home", "about", "tools", "publications", "contact"];
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -42,6 +45,28 @@ export function Nav() {
     return () => observer.disconnect();
   }, []);
 
+  /* Language toggle pills — forest green active, white border inactive */
+  const LangToggle = () => (
+    <div className="flex items-center gap-1 ml-3 shrink-0">
+      {(["en", "sv"] as const).map((l) => (
+        <button
+          key={l}
+          type="button"
+          onClick={() => setLang(l)}
+          aria-pressed={lang === l}
+          className={[
+            "px-2 py-0.5 rounded-full text-xs font-semibold transition-colors border",
+            lang === l
+              ? "bg-[#15803d] text-white border-[#15803d]"
+              : "bg-white text-[#15803d] border-[#15803d] hover:bg-green-50",
+          ].join(" ")}
+        >
+          {l === "en" ? "EN" : "SWE"}
+        </button>
+      ))}
+    </div>
+  );
+
   return (
     <>
       <header
@@ -51,10 +76,13 @@ export function Nav() {
         ].join(" ")}
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          {/* Logo */}
-          <a href="#home" className="text-primary font-bold text-base tracking-tight shrink-0">
-            Ans Imran Shahid
-          </a>
+          {/* Logo + language toggle side-by-side */}
+          <div className="flex items-center shrink-0">
+            <a href="#home" className="text-primary font-bold text-base tracking-tight">
+              Ans Imran Shahid
+            </a>
+            <LangToggle />
+          </div>
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-6" aria-label="Primary navigation">
@@ -74,17 +102,17 @@ export function Nav() {
             ))}
           </nav>
 
-          {/* Right CTA */}
+          {/* Right CTA — desktop */}
           <div className="hidden md:flex items-center gap-3">
             <span className="text-xs font-semibold text-primary bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">
-              Open to work
+              {tx(t.nav.openToWork, lang)}
             </span>
             <a
               href="/cv.pdf"
               download="Ans_Imran_Shahid_CV.pdf"
               className="btn-scale text-sm font-medium border border-primary text-primary px-4 py-1.5 rounded-lg hover:bg-primary-light transition-colors"
             >
-              Download CV
+              {tx(t.nav.downloadCv, lang)}
             </a>
           </div>
 
@@ -114,7 +142,11 @@ export function Nav() {
           aria-label="Mobile menu"
         >
           <div className="flex justify-between items-center px-6 h-16 border-b border-gray-100">
-            <span className="text-primary font-bold">Ans Imran Shahid</span>
+            {/* Name + toggle on same row mobile */}
+            <div className="flex items-center">
+              <span className="text-primary font-bold">Ans Imran Shahid</span>
+              <LangToggle />
+            </div>
             <button
               type="button"
               onClick={() => setMenuOpen(false)}
@@ -141,14 +173,14 @@ export function Nav() {
           </nav>
           <div className="px-6 mt-4 flex flex-col gap-3">
             <span className="text-sm font-semibold text-primary bg-green-50 border border-green-200 px-3 py-2 rounded-full text-center">
-              Open to work — LCA & Sustainability roles, Sweden
+              {tx(t.nav.openToWorkFull, lang)}
             </span>
             <a
               href="/cv.pdf"
               download="Ans_Imran_Shahid_CV.pdf"
               className="btn-scale text-center text-base font-medium border-2 border-primary text-primary px-4 py-3 rounded-lg hover:bg-primary-light transition-colors"
             >
-              Download CV
+              {tx(t.nav.downloadCv, lang)}
             </a>
           </div>
         </div>

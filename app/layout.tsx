@@ -1,28 +1,32 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import "./globals.css";
-import { SharedToolNav } from "@/components/SharedToolNav";
+import { LanguageProvider } from "@/lib/language-context";
 import { AnalyticsInit } from "./AnalyticsInit";
+import type { Lang } from "@/lib/translations";
 
 export const metadata: Metadata = {
-  title: "Ans Imran Shahid — LCA Specialist & Environmental Scientist, Gothenburg",
-  description:
-    "LCA specialist based in Gothenburg, Sweden. EU Horizon Europe researcher. CSRD certified. Open to LCA, sustainability, and ESG roles.",
-  keywords: [
-    "LCA",
-    "Life Cycle Assessment",
-    "CSRD",
-    "sustainability",
-    "Gothenburg",
-    "Sweden",
-    "environmental scientist",
-  ],
-  openGraph: {
-    title: "Ans Imran Shahid — LCA Specialist",
-    description:
-      "EU Horizon Europe LCA researcher. CSRD certified. Open to work in Sweden.",
-    url: "https://ans-imran.vercel.app",
-    type: "website",
+  title: {
+    default: "Ans Imran Shahid — LCA Specialist & Environmental Scientist, Gothenburg",
+    template: "%s | Ans Imran Shahid",
   },
+  description:
+    "Portfolio of Ans Imran Shahid, LCA specialist based in Gothenburg, Sweden. Free tools for LCA, CSRD, Scope 3, and environmental sustainability.",
+  keywords: [
+    "LCA", "Life Cycle Assessment", "CSRD", "sustainability",
+    "Gothenburg", "Sweden", "environmental scientist", "LCA specialist",
+  ],
+  authors: [{ name: "Ans Imran Shahid", url: "https://www.linkedin.com/in/ans-imran" }],
+  openGraph: {
+    title:       "Ans Imran Shahid — LCA Specialist",
+    description: "EU Horizon Europe LCA researcher. CSRD certified. Open to work in Sweden.",
+    url:         "https://ans-imran.vercel.app",
+    type:        "website",
+    locale:      "en_US",
+    alternateLocale: ["sv_SE"],
+    siteName:    "Ans Imran Shahid",
+  },
+  robots: { index: true, follow: true },
 };
 
 const jsonLd = {
@@ -42,13 +46,27 @@ const jsonLd = {
   },
 };
 
-export default function RootLayout({
+function detectLang(acceptLanguage: string | null): Lang {
+  if (!acceptLanguage) return "en";
+  const langs = acceptLanguage.split(",").map((l) => l.split(";")[0].trim().toLowerCase());
+  for (const l of langs) {
+    if (l.startsWith("sv")) return "sv";
+    if (l.startsWith("en")) return "en";
+  }
+  return "en";
+}
+
+export default async function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
+  const hdrs = await headers();
+  const acceptLanguage = hdrs.get("accept-language");
+  const defaultLang = detectLang(acceptLanguage);
+
   return (
-    <html lang="en">
+    <html lang={defaultLang} suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
@@ -56,9 +74,10 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <AnalyticsInit toolSlug="portfolio" />
-        <SharedToolNav currentTool="" lang="en" />
-        {children}
+        <LanguageProvider defaultLang={defaultLang}>
+          <AnalyticsInit toolSlug="portfolio" />
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

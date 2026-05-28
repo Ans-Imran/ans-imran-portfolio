@@ -1,7 +1,14 @@
+"use client";
+
+import { useLanguage } from "@/lib/language-context";
+import { t, tx } from "@/lib/translations";
+
 export function Hero() {
+  const { lang } = useLanguage();
+
   return (
     <section id="home" className="relative min-h-[90vh] flex flex-col justify-center items-center text-center px-4 pt-24 pb-16">
-      {/* Subtle lifecycle loop SVG — texture behind the name */}
+      {/* Subtle lifecycle loop SVG */}
       <div
         aria-hidden="true"
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none opacity-[0.07]"
@@ -10,12 +17,10 @@ export function Hero() {
         <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="100" cy="100" r="80" stroke="#15803d" strokeWidth="3" strokeDasharray="8 6" />
           <circle cx="100" cy="100" r="55" stroke="#15803d" strokeWidth="2" strokeDasharray="5 4" />
-          {/* Circular arrows */}
           <path d="M100 20 A80 80 0 0 1 180 100" stroke="#15803d" strokeWidth="4" strokeLinecap="round" />
           <polygon points="180,90 188,108 170,100" fill="#15803d" />
           <path d="M100 180 A80 80 0 0 1 20 100" stroke="#15803d" strokeWidth="4" strokeLinecap="round" />
           <polygon points="20,110 12,92 30,100" fill="#15803d" />
-          {/* Stage markers */}
           {[0,72,144,216,288].map((deg, i) => {
             const r = 80;
             const x = 100 + r * Math.sin((deg * Math.PI) / 180);
@@ -29,7 +34,7 @@ export function Hero() {
         {/* Open to work badge */}
         <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 text-primary text-xs font-semibold px-3 py-1.5 rounded-full mb-8">
           <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
-          Open to work — LCA & Sustainability roles, Sweden
+          {tx(t.hero.openToWork, lang)}
         </div>
 
         {/* Name */}
@@ -39,14 +44,13 @@ export function Hero() {
 
         {/* Title */}
         <p className="text-lg sm:text-xl font-semibold text-primary mb-1">
-          LCA Specialist & Environmental Scientist
+          {tx(t.hero.jobTitle, lang)}
         </p>
-        <p className="text-sm text-text-secondary mb-6">Gothenburg, Sweden</p>
+        <p className="text-sm text-text-secondary mb-6">{tx(t.hero.location, lang)}</p>
 
         {/* Tagline */}
         <p className="text-base sm:text-lg text-text-secondary leading-relaxed max-w-xl mx-auto mb-10">
-          ISO 14040/44-compliant LCA practitioner. EU Horizon Europe researcher.
-          CSRD certified. Building tools that make environmental data actionable.
+          {tx(t.hero.tagline, lang)}
         </p>
 
         {/* CTAs */}
@@ -55,14 +59,14 @@ export function Hero() {
             href="#tools"
             className="btn-scale bg-primary text-white font-semibold px-6 py-3 rounded-lg hover:bg-primary-dark transition-colors"
           >
-            View my work ↓
+            {tx(t.hero.viewWork, lang)}
           </a>
           <a
             href="/cv.pdf"
             download="Ans_Imran_Shahid_CV.pdf"
             className="btn-scale border-2 border-primary text-primary font-semibold px-6 py-3 rounded-lg hover:bg-primary-light transition-colors"
           >
-            Download CV
+            {tx(t.hero.downloadCv, lang)}
           </a>
         </div>
 

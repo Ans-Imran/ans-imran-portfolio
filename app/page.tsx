@@ -10,10 +10,12 @@ import { Testimonials } from "@/components/Testimonials";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { ScrollAnimator } from "@/components/ScrollAnimator";
+import { ToolNavBar } from "@/components/ToolNavBar";
 
 export default function Home() {
   return (
     <>
+      <ToolNavBar />
       <Nav />
       <ScrollAnimator />
       <Hero />

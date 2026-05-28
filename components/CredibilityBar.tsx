@@ -1,13 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-
-const STATS = [
-  { value: 1, label: "EU Project",           suffix: "" },
-  { value: 2, label: "Publications",         suffix: "" },
-  { value: 5, label: "Certifications",       suffix: "" },
-  { value: 1, label: "Peer-reviewed SOP",    suffix: "" },
-];
+import { useLanguage } from "@/lib/language-context";
+import { t, tx } from "@/lib/translations";
 
 function useCountUp(target: number, duration = 1200, start = false) {
   const [count, setCount] = useState(0);
@@ -17,7 +12,6 @@ function useCountUp(target: number, duration = 1200, start = false) {
     const step = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / duration, 1);
-      // Ease out
       const eased = 1 - Math.pow(1 - progress, 3);
       setCount(Math.round(eased * target));
       if (progress < 1) requestAnimationFrame(step);
@@ -40,8 +34,16 @@ function Stat({ value, label, suffix, animate }: { value: number; label: string;
 }
 
 export function CredibilityBar() {
+  const { lang } = useLanguage();
   const ref = useRef<HTMLDivElement>(null);
   const [animate, setAnimate] = useState(false);
+
+  const STATS = [
+    { value: 1, label: tx(t.credibility.euProject,    lang), suffix: "" },
+    { value: 2, label: tx(t.credibility.publications, lang), suffix: "" },
+    { value: 5, label: tx(t.credibility.certs,        lang), suffix: "" },
+    { value: 1, label: tx(t.credibility.reviewedSop,  lang), suffix: "" },
+  ];
 
   useEffect(() => {
     const el = ref.current;
