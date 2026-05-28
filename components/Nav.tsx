@@ -61,7 +61,7 @@ export function Nav() {
               : "bg-white text-[#15803d] border-[#15803d] hover:bg-green-50",
           ].join(" ")}
         >
-          {l === "en" ? "EN" : "SWE"}
+          {l === "en" ? "EN" : "SV"}
         </button>
       ))}
     </div>
