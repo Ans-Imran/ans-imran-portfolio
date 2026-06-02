@@ -20,11 +20,20 @@ export const metadata: Metadata = {
   openGraph: {
     title:       "Ans Imran Shahid — LCA Specialist",
     description: "EU Horizon Europe LCA researcher. CSRD certified. Open to work in Sweden.",
-    url:         "https://ans-imran.vercel.app",
+    url:         "https://ans-imran-portfolio.vercel.app",
     type:        "website",
     locale:      "en_US",
     alternateLocale: ["sv_SE"],
     siteName:    "Ans Imran Shahid",
+  },
+  twitter: {
+    card:        "summary",
+    title:       "Ans Imran Shahid — LCA Specialist & Environmental Scientist",
+    description: "EU Horizon Europe LCA researcher. CSRD certified. Open to work in Sweden.",
+    creator:     "@ans_imran",
+  },
+  alternates: {
+    canonical: "https://ans-imran-portfolio.vercel.app",
   },
   robots: { index: true, follow: true },
 };
@@ -34,10 +43,12 @@ const jsonLd = {
   "@type": "Person",
   name: "Ans Imran Shahid",
   jobTitle: "LCA Specialist & Environmental Scientist",
-  url: "https://ans-imran.vercel.app",
+  email: "ansimran300@gmail.com",
+  url: "https://ans-imran-portfolio.vercel.app",
   sameAs: [
     "https://www.linkedin.com/in/ans-imran",
     "https://orcid.org/0009-0009-0434-7988",
+    "https://github.com/Ans-Imran",
   ],
   address: {
     "@type": "PostalAddress",
