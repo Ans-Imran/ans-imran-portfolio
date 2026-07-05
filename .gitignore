@@ -36,3 +36,6 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# nested tool apps (each is its own git repo + Vercel project)
+/apps/
