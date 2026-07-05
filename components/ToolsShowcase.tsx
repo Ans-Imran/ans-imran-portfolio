@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { useLanguage } from "@/lib/language-context";
-import { t, tx } from "@/lib/translations";
+import { tx } from "@/lib/translations";
+import { useContent } from "@/lib/content-context";
 
 type TabKey = "carbon" | "scope3" | "csrd";
 
@@ -27,6 +28,7 @@ const HOTSPOT_DATA: Record<HotspotProduct, { stage_en: string; stage_sv: string;
 };
 
 function CarbonHotspotDemo({ lang }: { lang: "en" | "sv" }) {
+  const t = useContent();
   const [product, setProduct] = useState<HotspotProduct>("Laptop");
   const [animated, setAnimated] = useState(false);
 
@@ -121,6 +123,7 @@ function DonutChart({ segments }: { segments: { label: string; pct: number; colo
 }
 
 function Scope3Demo({ lang }: { lang: "en" | "sv" }) {
+  const t = useContent();
   const [employees, setEmployees] = useState(50);
   const [revenue, setRevenue]     = useState(25);
   const segments = calcScope3(employees, revenue, lang);
@@ -158,6 +161,7 @@ function checkCSRD(employees: number, listed: boolean) {
 }
 
 function CSRDDemo({ lang }: { lang: "en" | "sv" }) {
+  const t = useContent();
   const [employees, setEmployees] = useState<string>("300");
   const [listed, setListed]       = useState(false);
   const emp = parseInt(employees) || 0;
@@ -225,6 +229,7 @@ const TOOL_TECH = [
 
 export function ToolsShowcase() {
   const { lang } = useLanguage();
+  const t = useContent();
   const [activeTab, setActiveTab] = useState<TabKey>("carbon");
   const activeIdx  = TOOL_KEYS.indexOf(activeTab);
   const toolData   = t.tools.tools[activeIdx];
@@ -277,7 +282,7 @@ export function ToolsShowcase() {
                 ))}
               </ul>
               <div className="space-y-3">
-                <a href={TOOL_LINKS[activeIdx]} target="_blank" rel="noopener noreferrer" className="btn-scale flex items-center justify-center gap-1.5 bg-primary text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-primary-dark transition-colors">
+                <a href={TOOL_LINKS[activeIdx]} target="_blank" rel="noopener noreferrer" data-track={`tool:${activeTab}`} className="btn-scale flex items-center justify-center gap-1.5 bg-primary text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-primary-dark transition-colors">
                   {tx(t.tools.openTool, lang)}
                 </a>
                 <div className="flex flex-wrap gap-1">

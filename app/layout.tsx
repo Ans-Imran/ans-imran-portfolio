@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
 import { LanguageProvider } from "@/lib/language-context";
+import { ContentProvider } from "@/lib/content-context";
+import { mergeContent } from "@/lib/content";
+import { getContentOverrides } from "@/lib/admin-data";
 import { AnalyticsInit } from "./AnalyticsInit";
 import type { Lang } from "@/lib/translations";
 
@@ -75,6 +78,7 @@ export default async function RootLayout({
   const hdrs = await headers();
   const acceptLanguage = hdrs.get("accept-language");
   const defaultLang = detectLang(acceptLanguage);
+  const content = mergeContent(await getContentOverrides());
 
   return (
     <html lang={defaultLang} suppressHydrationWarning>
@@ -85,10 +89,12 @@ export default async function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <LanguageProvider defaultLang={defaultLang}>
-          <AnalyticsInit toolSlug="portfolio" />
-          {children}
-        </LanguageProvider>
+        <ContentProvider value={content}>
+          <LanguageProvider defaultLang={defaultLang}>
+            <AnalyticsInit toolSlug="portfolio" />
+            {children}
+          </LanguageProvider>
+        </ContentProvider>
       </body>
     </html>
   );

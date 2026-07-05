@@ -1,7 +1,8 @@
 "use client";
 
 import { useLanguage } from "@/lib/language-context";
-import { t, tx } from "@/lib/translations";
+import { tx } from "@/lib/translations";
+import { useContent } from "@/lib/content-context";
 
 const PUBLICATIONS = [
   {
@@ -38,6 +39,7 @@ const PUBLICATIONS = [
 
 export function Publications() {
   const { lang } = useLanguage();
+  const t = useContent();
 
   return (
     <section id="publications" className="py-20 bg-gray-50">

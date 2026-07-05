@@ -6,7 +6,6 @@ import { ToolsShowcase } from "@/components/ToolsShowcase";
 import { FeaturedProject } from "@/components/FeaturedProject";
 import { Publications } from "@/components/Publications";
 import { Education } from "@/components/Education";
-import { Testimonials } from "@/components/Testimonials";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { ScrollAnimator } from "@/components/ScrollAnimator";
@@ -23,7 +22,6 @@ export default function Home() {
       <FeaturedProject />
       <Publications />
       <Education />
-      <Testimonials />
       <Contact />
       <Footer />
     </>

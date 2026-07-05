@@ -1,10 +1,12 @@
 "use client";
 
 import { useLanguage } from "@/lib/language-context";
-import { t, tx } from "@/lib/translations";
+import { tx } from "@/lib/translations";
+import { useContent } from "@/lib/content-context";
 
 export function Footer() {
   const { lang } = useLanguage();
+  const t = useContent();
 
   return (
     <footer className="border-t border-gray-100 bg-white py-8">

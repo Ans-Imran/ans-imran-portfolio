@@ -1,7 +1,8 @@
 "use client";
 
 import { useLanguage } from "@/lib/language-context";
-import { t, tx } from "@/lib/translations";
+import { tx } from "@/lib/translations";
+import { useContent } from "@/lib/content-context";
 
 const SKILL_GROUPS = [
   {
@@ -24,6 +25,7 @@ const SKILL_GROUPS = [
 
 export function About() {
   const { lang } = useLanguage();
+  const t = useContent();
 
   return (
     <section id="about" className="py-20 bg-white">

@@ -1,10 +1,12 @@
 "use client";
 
 import { useLanguage } from "@/lib/language-context";
-import { t, tx } from "@/lib/translations";
+import { tx } from "@/lib/translations";
+import { useContent } from "@/lib/content-context";
 
 export function Hero() {
   const { lang } = useLanguage();
+  const t = useContent();
 
   return (
     <section id="home" className="relative min-h-[90vh] flex flex-col justify-center items-center text-center px-4 pt-24 pb-16">
@@ -62,8 +64,8 @@ export function Hero() {
             {tx(t.hero.viewWork, lang)}
           </a>
           <a
-            href="/cv.pdf"
-            download="Ans_Imran_Shahid_CV.pdf"
+            href="/api/cv"
+            data-track="cv"
             className="btn-scale border-2 border-primary text-primary font-semibold px-6 py-3 rounded-lg hover:bg-primary-light transition-colors"
           >
             {tx(t.hero.downloadCv, lang)}

@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/lib/language-context";
-import { t, tx } from "@/lib/translations";
+import { tx } from "@/lib/translations";
+import { useContent } from "@/lib/content-context";
 
 export function Nav() {
   const { lang, setLang } = useLanguage();
+  const t = useContent();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
@@ -108,8 +110,8 @@ export function Nav() {
               {tx(t.nav.openToWork, lang)}
             </span>
             <a
-              href="/cv.pdf"
-              download="Ans_Imran_Shahid_CV.pdf"
+              href="/api/cv"
+              data-track="cv"
               className="btn-scale text-sm font-medium border border-primary text-primary px-4 py-1.5 rounded-lg hover:bg-primary-light transition-colors"
             >
               {tx(t.nav.downloadCv, lang)}
@@ -176,8 +178,8 @@ export function Nav() {
               {tx(t.nav.openToWorkFull, lang)}
             </span>
             <a
-              href="/cv.pdf"
-              download="Ans_Imran_Shahid_CV.pdf"
+              href="/api/cv"
+              data-track="cv"
               className="btn-scale text-center text-base font-medium border-2 border-primary text-primary px-4 py-3 rounded-lg hover:bg-primary-light transition-colors"
             >
               {tx(t.nav.downloadCv, lang)}

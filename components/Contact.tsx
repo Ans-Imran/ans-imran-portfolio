@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { useLanguage } from "@/lib/language-context";
-import { t, tx } from "@/lib/translations";
+import { tx } from "@/lib/translations";
+import { useContent } from "@/lib/content-context";
 
 type Status = "idle" | "sending" | "success" | "error";
 
 export function Contact() {
   const { lang } = useLanguage();
+  const t = useContent();
   const [name, setName]       = useState("");
   const [email, setEmail]     = useState("");
   const [message, setMessage] = useState("");

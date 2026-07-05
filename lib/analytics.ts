@@ -23,10 +23,8 @@
  * endpoint defaults to the relative /api/track path.
  */
 
-const ENDPOINT: string =
-  typeof process !== "undefined" && process.env.NEXT_PUBLIC_ANALYTICS_ENDPOINT
-    ? process.env.NEXT_PUBLIC_ANALYTICS_ENDPOINT
-    : "/api/track";
+// The portfolio owns its analytics — always post to its own /api/track route.
+const ENDPOINT = "/api/track";
 
 function getDeviceType(ua: string): "mobile" | "tablet" | "desktop" {
   if (/tablet|ipad|playbook|silk/i.test(ua)) return "tablet";
@@ -97,6 +95,8 @@ function sendEvent(payload: Record<string, unknown>, useBeacon = false): void {
 /** Call once inside a useEffect (no deps) in your root layout. Returns a cleanup fn. */
 export function initAnalytics({ toolSlug }: { toolSlug: string }): () => void {
   if (typeof window === "undefined") return () => {};
+  // Never track the admin area as portfolio traffic.
+  if (window.location.pathname.startsWith("/admin")) return () => {};
 
   const ua = navigator.userAgent;
   const sessionId = getOrCreateSessionId();
@@ -116,12 +116,27 @@ export function initAnalytics({ toolSlug }: { toolSlug: string }): () => void {
     session_id:       sessionId,
     event_type:       "page_view",
     tool_slug:        toolSlug,
+    path:             window.location.pathname,
     device_type:      getDeviceType(ua),
     os:               getOS(ua),
     browser:          getBrowser(ua),
     referrer:         classifyReferrer(document.referrer),
     returned_visitor: checkReturningVisitor(),
   });
+
+  // Click tracking — any element (or ancestor) with a data-track attribute.
+  const onClick = (e: MouseEvent) => {
+    const el = (e.target as HTMLElement | null)?.closest?.("[data-track]");
+    if (!el) return;
+    sendEvent({
+      session_id: sessionId,
+      event_type: "click",
+      tool_slug:  toolSlug,
+      target:     el.getAttribute("data-track") || "unknown",
+      path:       window.location.pathname,
+    });
+  };
+  document.addEventListener("click", onClick, { capture: true });
 
   const onUnload = () => {
     window.removeEventListener("scroll", onScroll);
@@ -130,6 +145,7 @@ export function initAnalytics({ toolSlug }: { toolSlug: string }): () => void {
         session_id:       sessionId,
         event_type:       "page_leave",
         tool_slug:        toolSlug,
+        path:             window.location.pathname,
         duration_seconds: Math.round((Date.now() - startTime) / 1000),
         scroll_depth:     maxScroll,
       },
@@ -140,6 +156,7 @@ export function initAnalytics({ toolSlug }: { toolSlug: string }): () => void {
 
   return () => {
     window.removeEventListener("scroll", onScroll);
+    document.removeEventListener("click", onClick, { capture: true } as EventListenerOptions);
     window.removeEventListener("beforeunload", onUnload);
   };
 }

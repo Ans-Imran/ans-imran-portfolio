@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/lib/language-context";
-import { t, tx } from "@/lib/translations";
+import { tx } from "@/lib/translations";
+import { useContent } from "@/lib/content-context";
 
 function useCountUp(target: number, duration = 1200, start = false) {
   const [count, setCount] = useState(0);
@@ -47,6 +48,7 @@ function Stat({ value, label, suffix, animate }: {
 
 export function CredibilityBar() {
   const { lang } = useLanguage();
+  const t = useContent();
   const ref = useRef<HTMLDivElement>(null);
   const [animate, setAnimate] = useState(false);
 
