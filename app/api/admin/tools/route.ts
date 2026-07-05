@@ -32,3 +32,34 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ ok: true });
 }
+
+/** Update a row in the shared `tools` registry (name/url/icon/order/active/coming_soon). */
+export async function PATCH(req: NextRequest) {
+  let body: { id?: string | number; fields?: Record<string, unknown> };
+  try {
+    body = (await req.json()) as { id?: string | number; fields?: Record<string, unknown> };
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+  if (!body.id || !body.fields || typeof body.fields !== "object") {
+    return NextResponse.json({ error: "id and fields required" }, { status: 400 });
+  }
+  // whitelist editable columns
+  const allowed = ["name_en", "name_sv", "url", "icon", "display_order", "active", "coming_soon"];
+  const fields: Record<string, unknown> = {};
+  for (const k of allowed) if (k in body.fields) fields[k] = body.fields[k];
+  if (Object.keys(fields).length === 0) {
+    return NextResponse.json({ error: "no editable fields" }, { status: 400 });
+  }
+
+  try {
+    const client = getServiceClient();
+    const { error } = await client.from("tools").update(fields).eq("id", body.id);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Update failed";
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
+
+  return NextResponse.json({ ok: true });
+}
