@@ -21,16 +21,6 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mb-4 text-xs text-text-secondary">
-          <a href="https://carbon-hotspot-finder.vercel.app" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Carbon Hotspot Finder</a>
-          <span className="text-gray-200">·</span>
-          <a href="https://scope3-simulator.vercel.app" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Scope 3 Simulator</a>
-          <span className="text-gray-200">·</span>
-          <a href="https://csrd-compliance-checker.vercel.app" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">CSRD Checker</a>
-          <span className="text-gray-200">·</span>
-          <a href="https://lca-project-planner.vercel.app" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">LCA Planner</a>
-        </div>
-
         <div className="text-center text-xs text-gray-400">
           © 2026 · {tx(t.footer.built, lang)}
         </div>
