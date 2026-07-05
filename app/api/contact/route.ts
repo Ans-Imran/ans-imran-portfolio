@@ -33,8 +33,8 @@ export async function POST(req: NextRequest) {
       name: name.trim(),
       email: email.trim(),
       message: message.trim(),
-      source: "portfolio-contact",
-      created_at: new Date().toISOString(),
+      tool_slug: "portfolio-contact",
+      status: "new",
     });
   } catch {
     // Continue even if DB insert fails

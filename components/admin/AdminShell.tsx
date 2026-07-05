@@ -4,11 +4,13 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 const NAV = [
-  { href: "/admin",          label: "Dashboard" },
-  { href: "/admin/messages", label: "Messages" },
-  { href: "/admin/cv",       label: "CV versions" },
-  { href: "/admin/tools",    label: "Tool cards" },
-  { href: "/admin/content",  label: "Edit content" },
+  { href: "/admin",              label: "Analytics" },
+  { href: "/admin/messages",     label: "Messages" },
+  { href: "/admin/comments",     label: "Comments" },
+  { href: "/admin/publications", label: "Publications" },
+  { href: "/admin/cv",           label: "CV versions" },
+  { href: "/admin/tools",        label: "Tool cards" },
+  { href: "/admin/content",      label: "Edit content" },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
