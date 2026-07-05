@@ -5,7 +5,7 @@ import { useLanguage } from "@/lib/language-context";
 import { tx } from "@/lib/translations";
 import { useContent } from "@/lib/content-context";
 
-type TabKey = "carbon" | "scope3" | "csrd";
+type TabKey = "carbon" | "scope3" | "csrd" | "planner";
 
 /* ── Carbon Hotspot demo ── */
 const HOTSPOT_PRODUCTS = [
@@ -213,28 +213,148 @@ function CSRDDemo({ lang }: { lang: "en" | "sv" }) {
   );
 }
 
+/* ── Planner demo ── */
+const LCA_PRODUCTS_EN = ["Physical product", "Energy system", "Service", "Building/infrastructure", "Food system"];
+const LCA_PRODUCTS_SV = ["Fysisk produkt", "Energisystem", "Tjänst", "Byggnad/infrastruktur", "Livsmedelssystem"];
+
+const TIMELINE_MAP: Record<string, Record<string, { weeks: string; cost: string; std: string }>> = {
+  "Physical product":       { "Cradle-to-gate": { weeks: "4-6",   cost: "40,000–80,000",  std: "ISO 14040/44" }, "Cradle-to-grave": { weeks: "6-10",  cost: "70,000–120,000", std: "ISO 14040/44 + ISO 14067" }, "Cradle-to-cradle": { weeks: "8-14", cost: "90,000–150,000", std: "ISO 14040/44 + circular LCA" } },
+  "Energy system":          { "Cradle-to-gate": { weeks: "3-5",   cost: "35,000–65,000",  std: "ISO 14040/44" }, "Cradle-to-grave": { weeks: "5-9",  cost: "60,000–110,000", std: "ISO 14040/44" },             "Cradle-to-cradle": { weeks: "7-12", cost: "80,000–130,000", std: "ISO 14040/44 + EPBT" } },
+  "Service":                { "Cradle-to-gate": { weeks: "3-5",   cost: "30,000–60,000",  std: "ISO 14040/44" }, "Cradle-to-grave": { weeks: "4-8",  cost: "50,000–90,000",  std: "ISO 14040/44" },             "Cradle-to-cradle": { weeks: "6-10", cost: "70,000–110,000", std: "ISO 14040/44" } },
+  "Building/infrastructure":{ "Cradle-to-gate": { weeks: "6-10",  cost: "60,000–100,000", std: "ISO 14040/44 + EN 15978" }, "Cradle-to-grave": { weeks: "10-16", cost: "100,000–180,000", std: "ISO 14040/44 + EN 15978" }, "Cradle-to-cradle": { weeks: "14-20", cost: "140,000–220,000", std: "ISO 14040/44 + EN 15978" } },
+  "Food system":            { "Cradle-to-gate": { weeks: "4-7",   cost: "40,000–75,000",  std: "ISO 14040/44 + PCF" }, "Cradle-to-grave": { weeks: "6-11", cost: "65,000–115,000", std: "ISO 14040/44 + ISO 14067" }, "Cradle-to-cradle": { weeks: "9-14", cost: "85,000–145,000", std: "ISO 14040/44 + ISO 14067" } },
+};
+
+const SCOPES_EN = ["Cradle-to-gate", "Cradle-to-grave", "Cradle-to-cradle"];
+const SCOPES_SV = ["Vagga till grind", "Vagga till grav", "Vagga till vagga"];
+
+function PlannerDemo({ lang }: { lang: "en" | "sv" }) {
+  const t = useContent();
+  const [step, setStep]             = useState(0);
+  const [productType, setProductType] = useState("");
+  const [scope, setScope]           = useState("");
+  const [dataAvail, setDataAvail]   = useState("");
+  const [showResult, setShowResult] = useState(false);
+  const reset = () => { setStep(0); setProductType(""); setScope(""); setDataAvail(""); setShowResult(false); };
+
+  const LCA_PRODUCTS = lang === "sv" ? LCA_PRODUCTS_SV : LCA_PRODUCTS_EN;
+  const SCOPES       = lang === "sv" ? SCOPES_SV : SCOPES_EN;
+  const productKey = LCA_PRODUCTS_SV.includes(productType)
+    ? LCA_PRODUCTS_EN[LCA_PRODUCTS_SV.indexOf(productType)] ?? productType
+    : productType;
+  const scopeKey = SCOPES_SV.includes(scope)
+    ? SCOPES_EN[SCOPES_SV.indexOf(scope)] ?? scope
+    : scope;
+
+  const result = productKey && scopeKey && TIMELINE_MAP[productKey]?.[scopeKey]
+    ? TIMELINE_MAP[productKey][scopeKey]
+    : { weeks: "4-8", cost: "50,000–100,000", std: "ISO 14040/44" };
+
+  const DATA_OPTS_EN = ["Complete", "Partial", "Minimal"];
+  const DATA_OPTS_SV = ["Komplett", "Partiell", "Minimal"];
+  const DATA_OPTS = lang === "sv" ? DATA_OPTS_SV : DATA_OPTS_EN;
+  const DATA_DESC_EN = ["all process data ready", "some data gaps", "need full data collection"];
+  const DATA_DESC_SV = ["all processdata redo", "viss databrist", "behöver full datainsamling"];
+  const DATA_DESC = lang === "sv" ? DATA_DESC_SV : DATA_DESC_EN;
+
+  const dataIdx = DATA_OPTS.indexOf(dataAvail);
+  const dataAdj = dataIdx === 0 ? -1 : dataIdx === 1 ? 0 : 2;
+  const weekParts = result.weeks.split("-").map(Number);
+  const adjWeeks = `${weekParts[0] + dataAdj}–${weekParts[1] + dataAdj}`;
+
+  return (
+    <div className="space-y-4 min-h-[220px]">
+      {!showResult ? (
+        <div className="tool-panel">
+          <div className="flex items-center gap-1.5 mb-4">
+            {[0,1,2].map((i) => <div key={i} className={["w-6 h-1.5 rounded-full transition-colors", i <= step ? "bg-primary" : "bg-gray-200"].join(" ")} />)}
+            <span className="text-xs text-text-secondary ml-1">{tx(t.tools.stepOf, lang)} {step + 1} {tx(t.tools.of, lang)} 3</span>
+          </div>
+          {step === 0 && (
+            <div className="tool-panel">
+              <div className="text-sm font-semibold text-text-main mb-3">{tx(t.tools.whatTypeProduct, lang)}</div>
+              <div className="space-y-1.5">
+                {LCA_PRODUCTS.map((p) => (
+                  <button key={p} type="button" className={["w-full text-left px-3 py-2 rounded-lg text-sm border transition-colors", productType === p ? "bg-primary text-white border-primary" : "border-gray-200 hover:border-primary text-text-main"].join(" ")} onClick={() => { setProductType(p); setStep(1); }}>{p}</button>
+                ))}
+              </div>
+            </div>
+          )}
+          {step === 1 && (
+            <div className="tool-panel">
+              <div className="text-sm font-semibold text-text-main mb-3">{tx(t.tools.whatScope, lang)}</div>
+              <div className="space-y-1.5">
+                {SCOPES.map((s) => (
+                  <button key={s} type="button" className={["w-full text-left px-3 py-2 rounded-lg text-sm border transition-colors", scope === s ? "bg-primary text-white border-primary" : "border-gray-200 hover:border-primary text-text-main"].join(" ")} onClick={() => { setScope(s); setStep(2); }}>{s}</button>
+                ))}
+              </div>
+            </div>
+          )}
+          {step === 2 && (
+            <div className="tool-panel">
+              <div className="text-sm font-semibold text-text-main mb-3">{tx(t.tools.howComplete, lang)}</div>
+              <div className="space-y-1.5">
+                {DATA_OPTS.map((d, i) => (
+                  <button key={d} type="button" className={["w-full text-left px-3 py-2 rounded-lg text-sm border transition-colors", dataAvail === d ? "bg-primary text-white border-primary" : "border-gray-200 hover:border-primary text-text-main"].join(" ")} onClick={() => { setDataAvail(d); setShowResult(true); }}>{d} — {DATA_DESC[i]}</button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="tool-panel">
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4 space-y-3">
+            <div className="text-sm font-bold text-primary">{tx(t.tools.yourLcaEstimate, lang)}</div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-white rounded-lg p-3 border border-green-100">
+                <div className="text-xs text-text-secondary mb-0.5">{tx(t.tools.timeline, lang)}</div>
+                <div className="text-base font-bold text-text-main">{adjWeeks} {tx(t.tools.weeks, lang)}</div>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-green-100">
+                <div className="text-xs text-text-secondary mb-0.5">{tx(t.tools.estCost, lang)}</div>
+                <div className="text-base font-bold text-text-main">{result.cost}</div>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg p-3 border border-green-100">
+              <div className="text-xs text-text-secondary mb-0.5">{tx(t.tools.recStandard, lang)}</div>
+              <div className="text-sm font-semibold text-text-main">{result.std}</div>
+            </div>
+          </div>
+          <button type="button" onClick={reset} className="mt-3 text-xs text-primary hover:underline">{tx(t.tools.tryAgain, lang)}</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── Main component ── */
-const TOOL_KEYS: TabKey[] = ["carbon", "scope3", "csrd"];
+const TOOL_KEYS: TabKey[] = ["carbon", "scope3", "csrd", "planner"];
 const TOOL_LINKS = [
   "https://carbon-hotspot-finder.vercel.app",
   "https://scope3-simulator.vercel.app",
   "https://csrd-compliance-checker.vercel.app",
+  "https://lca-project-planner.vercel.app",
 ];
-const TOOL_ICONS = ["🔍", "📊", "✅"];
+const TOOL_ICONS = ["🔍", "📊", "✅", "📋"];
 const TOOL_TECH = [
   ["Next.js", "TypeScript", "ecoinvent", "ISO 14067"],
   ["Next.js", "TypeScript", "GHG Protocol", "CSRD/ESRS"],
   ["Next.js", "TypeScript", "CSRD Directive", "ESRS"],
+  ["Next.js", "TypeScript", "ISO 14040/44", "PostgreSQL"],
 ];
 
 export function ToolsShowcase() {
   const { lang } = useLanguage();
   const t = useContent();
   const [activeTab, setActiveTab] = useState<TabKey>("carbon");
-  const activeIdx  = TOOL_KEYS.indexOf(activeTab);
-  const toolData   = t.tools.tools[activeIdx];
-
   const handleTabChange = useCallback((key: TabKey) => setActiveTab(key), []);
+
+  const visibility = (t as unknown as { toolsVisibility?: Record<string, boolean> }).toolsVisibility;
+  const visibleKeys = TOOL_KEYS.filter((k) => visibility?.[k] !== false);
+  if (visibleKeys.length === 0) return null;
+  const effectiveTab: TabKey = visibleKeys.includes(activeTab) ? activeTab : visibleKeys[0];
+  const activeIdx  = TOOL_KEYS.indexOf(effectiveTab);
+  const toolData   = t.tools.tools[activeIdx];
 
   return (
     <section id="tools" className="py-20 bg-primary-light">
@@ -245,21 +365,24 @@ export function ToolsShowcase() {
         </div>
 
         <div className="flex gap-1 overflow-x-auto scrollbar-hide pb-1 mb-6 fade-up">
-          {TOOL_KEYS.map((key, i) => (
+          {visibleKeys.map((key) => {
+            const oi = TOOL_KEYS.indexOf(key);
+            return (
             <button
               key={key}
               type="button"
               onClick={() => handleTabChange(key)}
-              className={["flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors shrink-0", activeTab === key ? "bg-primary text-white shadow-sm" : "bg-white text-text-secondary hover:text-text-main hover:bg-white/80 border border-gray-100"].join(" ")}
+              className={["flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors shrink-0", effectiveTab === key ? "bg-primary text-white shadow-sm" : "bg-white text-text-secondary hover:text-text-main hover:bg-white/80 border border-gray-100"].join(" ")}
             >
-              <span>{TOOL_ICONS[i]}</span>
-              <span>{tx(t.tools.tools[i].name, lang)}</span>
+              <span>{TOOL_ICONS[oi]}</span>
+              <span>{tx(t.tools.tools[oi].name, lang)}</span>
             </button>
-          ))}
+            );
+          })}
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden fade-up">
-          <div key={activeTab} className="tool-panel grid md:grid-cols-5 gap-0 min-h-[400px]">
+          <div key={effectiveTab} className="tool-panel grid md:grid-cols-5 gap-0 min-h-[400px]">
             <div className="md:col-span-2 p-6 lg:p-8 border-b md:border-b-0 md:border-r border-gray-100 flex flex-col">
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-2xl">{TOOL_ICONS[activeIdx]}</span>
@@ -282,7 +405,7 @@ export function ToolsShowcase() {
                 ))}
               </ul>
               <div className="space-y-3">
-                <a href={TOOL_LINKS[activeIdx]} target="_blank" rel="noopener noreferrer" data-track={`tool:${activeTab}`} className="btn-scale flex items-center justify-center gap-1.5 bg-primary text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-primary-dark transition-colors">
+                <a href={TOOL_LINKS[activeIdx]} target="_blank" rel="noopener noreferrer" data-track={`tool:${effectiveTab}`} className="btn-scale flex items-center justify-center gap-1.5 bg-primary text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-primary-dark transition-colors">
                   {tx(t.tools.openTool, lang)}
                 </a>
                 <div className="flex flex-wrap gap-1">
@@ -295,9 +418,10 @@ export function ToolsShowcase() {
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                 {tx(t.tools.liveDemo, lang)}
               </div>
-              {activeTab === "carbon"  && <CarbonHotspotDemo lang={lang} />}
-              {activeTab === "scope3"  && <Scope3Demo lang={lang} />}
-              {activeTab === "csrd"    && <CSRDDemo lang={lang} />}
+              {effectiveTab === "carbon"  && <CarbonHotspotDemo lang={lang} />}
+              {effectiveTab === "scope3"  && <Scope3Demo lang={lang} />}
+              {effectiveTab === "csrd"    && <CSRDDemo lang={lang} />}
+              {effectiveTab === "planner" && <PlannerDemo lang={lang} />}
             </div>
           </div>
         </div>
