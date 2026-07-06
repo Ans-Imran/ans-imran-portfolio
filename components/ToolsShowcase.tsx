@@ -343,18 +343,35 @@ const TOOL_TECH = [
   ["Next.js", "TypeScript", "ISO 14040/44", "PostgreSQL"],
 ];
 
-export function ToolsShowcase() {
+export interface RegTool { slug: string; name_en: string; name_sv: string; url: string; icon: string; display_order: number; }
+const SLUG_BY_KEY: Record<TabKey, string> = { carbon: "carbon-hotspot", scope3: "scope3-simulator", csrd: "csrd-checker", planner: "lca-planner" };
+
+export function ToolsShowcase({ registry = [] }: { registry?: RegTool[] }) {
   const { lang } = useLanguage();
   const t = useContent();
   const [activeTab, setActiveTab] = useState<TabKey>("carbon");
   const handleTabChange = useCallback((key: TabKey) => setActiveTab(key), []);
 
+  // Registry (shared tools table) drives name/url/icon/order; hardcoded values are the fallback.
+  const bySlug = new Map(registry.map((r) => [r.slug, r]));
+  const meta = (key: TabKey) => {
+    const i = TOOL_KEYS.indexOf(key);
+    const r = bySlug.get(SLUG_BY_KEY[key]);
+    return {
+      name: r ? { en: r.name_en, sv: r.name_sv } : t.tools.tools[i].name,
+      url: r?.url || TOOL_LINKS[i],
+      icon: r?.icon || TOOL_ICONS[i],
+      order: r?.display_order ?? i + 1,
+    };
+  };
+
   const visibility = (t as unknown as { toolsVisibility?: Record<string, boolean> }).toolsVisibility;
-  const visibleKeys = TOOL_KEYS.filter((k) => visibility?.[k] !== false);
+  const visibleKeys = TOOL_KEYS.filter((k) => visibility?.[k] !== false).sort((a, b) => meta(a).order - meta(b).order);
   if (visibleKeys.length === 0) return null;
   const effectiveTab: TabKey = visibleKeys.includes(activeTab) ? activeTab : visibleKeys[0];
   const activeIdx  = TOOL_KEYS.indexOf(effectiveTab);
   const toolData   = t.tools.tools[activeIdx];
+  const activeMeta = meta(effectiveTab);
 
   return (
     <section id="tools" className="py-20 bg-primary-light">
@@ -366,7 +383,7 @@ export function ToolsShowcase() {
 
         <div className="flex gap-1 overflow-x-auto scrollbar-hide pb-1 mb-6 fade-up">
           {visibleKeys.map((key) => {
-            const oi = TOOL_KEYS.indexOf(key);
+            const m = meta(key);
             return (
             <button
               key={key}
@@ -374,8 +391,8 @@ export function ToolsShowcase() {
               onClick={() => handleTabChange(key)}
               className={["flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors shrink-0", effectiveTab === key ? "bg-primary text-white shadow-sm" : "bg-white text-text-secondary hover:text-text-main hover:bg-white/80 border border-gray-100"].join(" ")}
             >
-              <span>{TOOL_ICONS[oi]}</span>
-              <span>{tx(t.tools.tools[oi].name, lang)}</span>
+              <span>{m.icon}</span>
+              <span>{tx(m.name, lang)}</span>
             </button>
             );
           })}
@@ -385,8 +402,8 @@ export function ToolsShowcase() {
           <div key={effectiveTab} className="tool-panel grid md:grid-cols-5 gap-0 min-h-[400px]">
             <div className="md:col-span-2 p-6 lg:p-8 border-b md:border-b-0 md:border-r border-gray-100 flex flex-col">
               <div className="flex items-center gap-2 mb-4">
-                <span className="text-2xl">{TOOL_ICONS[activeIdx]}</span>
-                <span className="text-base font-bold text-text-main">{tx(toolData.name, lang)}</span>
+                <span className="text-2xl">{activeMeta.icon}</span>
+                <span className="text-base font-bold text-text-main">{tx(activeMeta.name, lang)}</span>
               </div>
               <div className="mb-4">
                 <div className="text-xs font-semibold text-text-secondary uppercase tracking-wide mb-1">{tx(t.tools.theProblem, lang)}</div>
@@ -405,7 +422,7 @@ export function ToolsShowcase() {
                 ))}
               </ul>
               <div className="space-y-3">
-                <a href={TOOL_LINKS[activeIdx]} target="_blank" rel="noopener noreferrer" data-track={`tool:${effectiveTab}`} className="btn-scale flex items-center justify-center gap-1.5 bg-primary text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-primary-dark transition-colors">
+                <a href={activeMeta.url} target="_blank" rel="noopener noreferrer" data-track={`tool:${effectiveTab}`} className="btn-scale flex items-center justify-center gap-1.5 bg-primary text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-primary-dark transition-colors">
                   {tx(t.tools.openTool, lang)}
                 </a>
                 <div className="flex flex-wrap gap-1">

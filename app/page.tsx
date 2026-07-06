@@ -9,8 +9,12 @@ import { Education } from "@/components/Education";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { ScrollAnimator } from "@/components/ScrollAnimator";
+import { getToolsRegistry } from "@/lib/admin-data";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const { rows: registry } = await getToolsRegistry();
   return (
     <>
       <Nav />
@@ -18,7 +22,7 @@ export default function Home() {
       <Hero />
       <CredibilityBar />
       <About />
-      <ToolsShowcase />
+      <ToolsShowcase registry={registry} />
       <FeaturedProject />
       <Publications />
       <Education />
