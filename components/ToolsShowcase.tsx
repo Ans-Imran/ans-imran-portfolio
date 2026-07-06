@@ -349,7 +349,7 @@ const SLUG_BY_KEY: Record<TabKey, string> = { carbon: "carbon-hotspot", scope3: 
 export function ToolsShowcase({ registry = [] }: { registry?: RegTool[] }) {
   const { lang } = useLanguage();
   const t = useContent();
-  const [activeTab, setActiveTab] = useState<TabKey>("carbon");
+  const [activeTab, setActiveTab] = useState<TabKey | null>(null);
   const handleTabChange = useCallback((key: TabKey) => setActiveTab(key), []);
 
   // Registry (shared tools table) drives name/url/icon/order; hardcoded values are the fallback.
@@ -368,7 +368,7 @@ export function ToolsShowcase({ registry = [] }: { registry?: RegTool[] }) {
   const visibility = (t as unknown as { toolsVisibility?: Record<string, boolean> }).toolsVisibility;
   const visibleKeys = TOOL_KEYS.filter((k) => visibility?.[k] !== false).sort((a, b) => meta(a).order - meta(b).order);
   if (visibleKeys.length === 0) return null;
-  const effectiveTab: TabKey = visibleKeys.includes(activeTab) ? activeTab : visibleKeys[0];
+  const effectiveTab: TabKey = activeTab && visibleKeys.includes(activeTab) ? activeTab : visibleKeys[0];
   const activeIdx  = TOOL_KEYS.indexOf(effectiveTab);
   const toolData   = t.tools.tools[activeIdx];
   const activeMeta = meta(effectiveTab);
